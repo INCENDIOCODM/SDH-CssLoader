@@ -40,6 +40,13 @@ jobs:
       run: |
         mkdir upload
         cd /tmp/output
+        # Ensure exactly one zip file exists
+        ZIP_COUNT=$(ls -1 *.zip 2>/dev/null | wc -l)
+        if [ "$ZIP_COUNT" -ne 1 ]; then
+          echo "Error: Expected exactly 1 zip file, found $ZIP_COUNT"
+          ls -la
+          exit 1
+        fi
         unzip *.zip -d $GITHUB_WORKSPACE/upload
     
     - name: Upload package artifact
