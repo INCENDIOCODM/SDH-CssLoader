@@ -1,6 +1,6 @@
 import os, re, uuid, asyncio, json, aiohttp, time
 from typing import List
-from css_utils import get_theme_path, Log, Result, PLATFORM_WIN
+from css_utils import get_theme_path, Log, Result, PLATFORM_WIN, get_steam_port
 import css_inject
 
 MAX_QUEUE_SIZE = 500
@@ -415,7 +415,8 @@ class BrowserHook:
             await asyncio.sleep(3)
             try:
                 async with aiohttp.ClientSession(trust_env=PLATFORM_WIN) as web:
-                    res = await web.get(f"http://127.0.0.1:8080/json/version", timeout=3)
+                    port = get_steam_port() or 8080
+                    res = await web.get(f"http://127.0.0.1:{port}/json/version", timeout=3)
 
                 if (res.status != 200):
                     raise Exception(f"/json/version returned {res.status}")

@@ -1,5 +1,6 @@
 from logging import getLogger
 import os, platform, traceback
+import psutil
 
 HOME = os.getenv("HOME")
 
@@ -98,6 +99,25 @@ def get_steam_path() -> str:
             return "C:\\Program Files (x86)\\Steam" # Taking a guess here
     else:
         return f"{get_user_home()}/.steam/steam"
+
+# --- Added get_steam_port utility ---
+def get_steam_port():
+    # Look for the Steam process by name
+    for proc in psutil.process_iter(['pid', 'name']):
+        try:
+            if proc.info['name'] and proc.info['name'].lower() == 'steamwebhelper.exe':
+                # Get network connections for this process
+                connections = proc.net_connections(kind='inet')
+                for conn in connections:
+                    # Look for a listening port
+                    if conn.status == 'LISTEN':
+                        return conn.laddr.port
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            continue
+    return None
+
+# Apply the detected port to the variable PORT
+detected_port = get_steam_port()
 
 def is_steam_beta_active() -> bool:
     beta_path = os.path.join(get_steam_path(), "package", "beta")
