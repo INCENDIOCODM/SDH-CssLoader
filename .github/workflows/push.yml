@@ -25,16 +25,21 @@ jobs:
       run: |
         pnpm run build
       
-    - name: Package Release
+    - name: Download Decky CLI
       run: |
-        mkdir "SDH-CssLoader"
-        cp *.py "./SDH-CssLoader"
-        cp *.json "./SDH-CssLoader"
-        cp LICENSE "./SDH-CssLoader"
-        cp README.md "./SDH-CssLoader"
-        cp -r dist "./SDH-CssLoader"
+        mkdir /tmp/decky-cli
+        curl -L -o /tmp/decky-cli/decky "https://github.com/SteamDeckHomebrew/cli/releases/latest/download/decky-linux-x86_64"
+        chmod +x /tmp/decky-cli/decky
+        echo "/tmp/decky-cli" >> $GITHUB_PATH
+    
+    - name: Build plugin with Decky CLI
+      run: |
+        decky plugin build -b -o /tmp/output -s directory .
+      
+    - name: Unzip plugin
+      run: |
         mkdir upload
-        mv "./SDH-CssLoader" ./upload
+        unzip /tmp/output/SDH-CssLoader.zip -d ./upload
     
     - name: Upload package artifact
       uses: actions/upload-artifact@v3
