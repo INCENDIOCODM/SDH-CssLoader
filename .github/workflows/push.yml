@@ -28,7 +28,7 @@ jobs:
     - name: Download Decky CLI
       run: |
         mkdir /tmp/decky-cli
-        curl -L -o /tmp/decky-cli/decky "https://github.com/SteamDeckHomebrew/cli/releases/latest/download/decky-linux-x86_64"
+        curl -Lf -o /tmp/decky-cli/decky "https://github.com/SteamDeckHomebrew/cli/releases/download/0.0.2/decky-linux-x86_64"
         chmod +x /tmp/decky-cli/decky
         echo "/tmp/decky-cli" >> $GITHUB_PATH
     
@@ -39,7 +39,8 @@ jobs:
     - name: Unzip plugin
       run: |
         mkdir upload
-        unzip /tmp/output/SDH-CssLoader.zip -d ./upload
+        cd /tmp/output
+        unzip *.zip -d $GITHUB_WORKSPACE/upload
     
     - name: Upload package artifact
       uses: actions/upload-artifact@v3
